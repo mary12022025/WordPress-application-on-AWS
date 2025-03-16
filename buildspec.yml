@@ -41,11 +41,11 @@ phases:
       - echo "Deploying WordPress for ${NAMESPACE}"
       - kubectl apply -f deployment.yml -n ${NAMESPACE}
       
-artifacts:
-  files:
-    - '**/*'  
-  base-directory: .  
-  discard-paths: no
+# artifacts:
+#   files:
+#     - '**/*'  
+#   base-directory: .  
+#   discard-paths: no
 
    
 
