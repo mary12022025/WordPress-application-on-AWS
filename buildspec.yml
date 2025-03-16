@@ -49,12 +49,12 @@ phases:
 
    
 
-# artifacts:
-#   files:
-#     - deployment.yml
-#     - mysql-deployment.yaml
-#     - namespace.yaml
-#     - service.yaml
-#   discard-paths: yes
+artifacts:
+  files:
+    - deployment.yml
+    - mysql-deployment.yaml
+    - namespace.yaml
+    - service.yaml
+  discard-paths: yes
     
     
