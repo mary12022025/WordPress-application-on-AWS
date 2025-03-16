@@ -3,7 +3,7 @@ FROM wordpress:latest
 
 # Set environment variables
 ARG ENV_FILE
-COPY ./envs/$ENV_FILE /usr/src/wordpress/.env
+COPY ./$ENV_FILE /usr/src/wordpress/.env
 
 # Start Apache server
 CMD ["apache2-foreground"]
