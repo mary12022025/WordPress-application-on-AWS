@@ -4,31 +4,20 @@ phases:
     commands:
       - echo "Logging in to Amazon ECR"
       - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 557690612191.dkr.ecr.us-east-1.amazonaws.com
-      - echo "Setting up environment for $ENV_FILE"
-      - export WORDPRESS_DB_PASSWORD=$CODEBUILD_WORDPRESS_DB_PASSWORD
-      - export MYSQL_ROOT_PASSWORD=$CODEBUILD_MYSQL_ROOT_PASSWORD
+      - echo "Setting up environment for ${ENV_FILE:-test}"
+      - export WORDPRESS_DB_PASSWORD=${CODEBUILD_WORDPRESS_DB_PASSWORD:-default_password}
+      - export MYSQL_ROOT_PASSWORD=${CODEBUILD_MYSQL_ROOT_PASSWORD:-default_root_password}
+
   build:
     commands:
-      - echo "Building the Docker image for $ENV_FILE"
-      - docker build --build-arg ENV_FILE=$ENV_FILE -t 557690612191.dkr.ecr.us-east-1.amazonaws.com/wp-ecr:$ENV_FILE .
-      - docker tag 557690612191.dkr.ecr.us-east-1.amazonaws.com/wp-ecr:$ENV_FILE 557690612191.dkr.ecr.us-east-1.amazonaws.com/wp-ecr:latest
+      - echo "Building the Docker image for ${ENV_FILE:-test}"
+      - docker build --build-arg ENV_FILE=${ENV_FILE:-test} -t 557690612191.dkr.ecr.us-east-1.amazonaws.com/wp-ecr:${ENV_FILE:-test} .
+      - docker tag 557690612191.dkr.ecr.us-east-1.amazonaws.com/wp-ecr:${ENV_FILE:-test} 557690612191.dkr.ecr.us-east-1.amazonaws.com/wp-ecr:latest
+
   post_build:
     commands:
       - echo "Pushing the Docker image"
-      - docker push 557690612191.dkr.ecr.us-east-1.amazonaws.com/wp-ecr:$ENV_FILE
+      - docker push 557690612191.dkr.ecr.us-east-1.amazonaws.com/wp-ecr:${ENV_FILE:-test}
       - docker push 557690612191.dkr.ecr.us-east-1.amazonaws.com/wp-ecr:latest
-      - echo "Creating namespace if not exists: $NAMESPACE"
-      - kubectl get namespace $NAMESPACE || kubectl create namespace $NAMESPACE
-      - echo "Deploying MySQL Database for $NAMESPACE namespace"
-      - kubectl apply -f mysql-deployment.yaml -n $NAMESPACE
-      - echo "Waiting for MySQL to be ready"
-      - sleep 30  # Wait to ensure MySQL starts
-      - echo "Applying Kubernetes Secrets"
-      - kubectl apply -f wordpress-secret.yaml -n $NAMESPACE
-      - echo "Applying Kubernetes Service for Load Balancer"
-      - kubectl apply -f service.yaml -n $NAMESPACE
-      - echo "Deploying WordPress for $DEPLOYMENT_NAME"
-      - kubectl apply -f deployment.yml -n $NAMESPACE
-artifacts:
-  files: []
 
+      - echo "Ensuring namespace $NAMESPACE
