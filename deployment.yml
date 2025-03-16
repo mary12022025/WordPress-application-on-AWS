@@ -22,8 +22,5 @@ spec:
         envFrom:
         - configMapRef:
             name: wordpress-config
-      env:
-        - name: WORDPRESS_DB_PASSWORD
-          value: "wppassword"
      #   - secretRef:
       #      name: wordpress-secret
