@@ -11,7 +11,7 @@ phases:
   build:
     commands:
       - echo "Building the Docker image for ${ENV_FILE:-test}"
-      - docker build --build-arg ENV_FILE=${ENV_FILE:-test.env} -t 557690612191.dkr.ecr.us-east-1.amazonaws.com/wp-ecr:${ENV_FILE:-test} .
+      - docker build --build-arg ENV_FILE=env.${ENV_FILE:-test} -t 557690612191.dkr.ecr.us-east-1.amazonaws.com/wp-ecr:${ENV_FILE:-test} .
       - docker tag 557690612191.dkr.ecr.us-east-1.amazonaws.com/wp-ecr:${ENV_FILE:-test} 557690612191.dkr.ecr.us-east-1.amazonaws.com/wp-ecr:latest
 
   post_build:
@@ -19,5 +19,24 @@ phases:
       - echo "Pushing the Docker image"
       - docker push 557690612191.dkr.ecr.us-east-1.amazonaws.com/wp-ecr:${ENV_FILE:-test}
       - docker push 557690612191.dkr.ecr.us-east-1.amazonaws.com/wp-ecr:latest
+      - docker push 557690612191.dkr.ecr.us-east-1.amazonaws.com/wp-ecr:${ENV_FILE:-prod}
 
-      - echo "Ensuring namespace $NAMESPACE
+      - echo "Ensuring namespace ${NAMESPACE:-wordpress-test}"
+      - kubectl get namespace ${NAMESPACE:-wordpress-test} || kubectl create namespace ${NAMESPACE:-wordpress-test}
+
+      - echo "Deploying MySQL Database for $NAMESPACE namespace"
+      - kubectl apply -f mysql-deployment.yaml -n ${NAMESPACE:-wordpress-test}
+      - echo "Waiting for MySQL to be ready..."
+      - until kubectl get pods -n ${NAMESPACE:-wordpress-test} | grep mysql | grep Running; do echo "Waiting..."; sleep 5; done
+
+      - echo "Applying Kubernetes Secrets"
+      - kubectl apply -f wordpress-secret.yaml -n ${NAMESPACE:-wordpress-test}
+
+      - echo "Applying Kubernetes Service for Load Balancer"
+      - kubectl apply -f service.yaml -n ${NAMESPACE:-wordpress-test}
+
+      - echo "Deploying WordPress for ${DEPLOYMENT_NAME:-wordpress-test}"
+      - kubectl apply -f deployment.yml -n ${NAMESPACE:-wordpress-test}
+
+artifacts:
+  files: []
