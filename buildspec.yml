@@ -7,6 +7,8 @@ phases:
       - echo "Setting up environment for ${ENV_FILE:-test}"
       - export WORDPRESS_DB_PASSWORD=${CODEBUILD_WORDPRESS_DB_PASSWORD:-default_password}
       - export MYSQL_ROOT_PASSWORD=${CODEBUILD_MYSQL_ROOT_PASSWORD:-default_root_password}
+      - echo "Updating kubeconfig for EKS access"
+      - aws eks update-kubeconfig --region us-east-1 --name wp-cluster
 
   build:
     commands:
