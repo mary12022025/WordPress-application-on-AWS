@@ -1,5 +1,4 @@
 # Use the official WordPress image
-# Use the official WordPress image
 FROM wordpress:latest
 
 # Set environment variables
