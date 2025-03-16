@@ -34,8 +34,6 @@ phases:
       - echo "Waiting for MySQL to be ready..."
       - until kubectl get pods -n ${NAMESPACE} | grep mysql | grep Running; do echo "Waiting..."; sleep 5; done
 
-      - echo "Applying Kubernetes Secrets"
-      - kubectl apply -f wordpress-secret.yaml -n ${NAMESPACE}
 
       - echo "Applying Kubernetes Service for Load Balancer"
       - kubectl apply -f service.yaml -n ${NAMESPACE}
