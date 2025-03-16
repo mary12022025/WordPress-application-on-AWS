@@ -40,13 +40,21 @@ phases:
 
       - echo "Deploying WordPress for ${NAMESPACE}"
       - kubectl apply -f deployment.yml -n ${NAMESPACE}
-
+      
 artifacts:
   files:
-    - deployment.yml
-    - mysql-deployment.yaml
-    - namespace.yaml
-    - service.yaml
-  discard-paths: yes
+    - '**/*'  
+  base-directory: .  
+  discard-paths: no
+
+   
+
+# artifacts:
+#   files:
+#     - deployment.yml
+#     - mysql-deployment.yaml
+#     - namespace.yaml
+#     - service.yaml
+#   discard-paths: yes
     
     
