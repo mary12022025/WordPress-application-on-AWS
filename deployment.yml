@@ -22,5 +22,4 @@ spec:
         envFrom:
         - configMapRef:
             name: wordpress-config
-     #   - secretRef:
-      #      name: wordpress-secret
+
