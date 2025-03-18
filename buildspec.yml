@@ -3,27 +3,27 @@ phases:
   pre_build:
     commands:
       - echo "Logging in to Amazon ECR"
-      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 557690612191.dkr.ecr.us-east-1.amazonaws.com
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 888577036327.dkr.ecr.us-east-1.amazonaws.com
       - echo "Setting up environment for ${ENV_FILE:-test}"
       - export WORDPRESS_DB_PASSWORD=${CODEBUILD_WORDPRESS_DB_PASSWORD:-default_password}
       - export MYSQL_ROOT_PASSWORD=${CODEBUILD_MYSQL_ROOT_PASSWORD:-default_root_password}
       - echo "Updating kubeconfig for EKS access"
-      - aws eks update-kubeconfig --region us-east-1 --name wp-cluster --role-arn arn:aws:iam::557690612191:role/eks-access-role
+      - aws eks update-kubeconfig --region us-east-1 --name wordpress-eks --role-arn arn:aws:iam::888577036327:role/AmazonEKSAutoClusterRole
       - echo "Checking Kubernetes cluster access"
       - kubectl cluster-info
 
   build:
     commands:
       - echo "Building the Docker image for ${ENV_FILE:-test}"
-      - docker build --build-arg ENV_FILE=${ENV_FILE:-test} -t 557690612191.dkr.ecr.us-east-1.amazonaws.com/wp-ecr:${ENV_FILE:-test} .
-      - docker tag 557690612191.dkr.ecr.us-east-1.amazonaws.com/wp-ecr:${ENV_FILE:-test} 557690612191.dkr.ecr.us-east-1.amazonaws.com/wp-ecr:latest
+      - docker build --build-arg ENV_FILE=${ENV_FILE:-test} -t 888577036327.dkr.ecr.us-east-1.amazonaws.com/wp-ecr:${ENV_FILE:-test} .
+      - docker tag 888577036327.dkr.ecr.us-east-1.amazonaws.com/wordpress:${ENV_FILE:-test} 888577036327.dkr.ecr.us-east-1.amazonaws.com/wordpress:latest
 
   post_build:
     commands:
       - echo "Pushing the Docker image"
-      - docker push 557690612191.dkr.ecr.us-east-1.amazonaws.com/wp-ecr:${ENV_FILE:-test}
-      - docker push 557690612191.dkr.ecr.us-east-1.amazonaws.com/wp-ecr:latest
-      - docker push 557690612191.dkr.ecr.us-east-1.amazonaws.com/wp-ecr:${ENV_FILE:-prod}
+      - docker push 888577036327.dkr.ecr.us-east-1.amazonaws.com/wordpress:${ENV_FILE:-test}
+      - docker push 888577036327.dkr.ecr.us-east-1.amazonaws.com/wordpress:latest
+      - docker push 888577036327.dkr.ecr.us-east-1.amazonaws.com/wordpress:${ENV_FILE:-prod}
 
       - export NAMESPACE=wordpress-${ENV_FILE:-test}
       - echo "Ensuring namespace ${NAMESPACE}"
